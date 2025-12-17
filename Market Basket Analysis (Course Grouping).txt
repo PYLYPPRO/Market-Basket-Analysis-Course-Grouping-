@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Market Basket Analysis (Course Grouping)</title>
+    <style>
+        /* Styles omitted for brevity */
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>21. Market Basket Analysis Simulation (Course Grouping)</h1>
+    
+    <p class="explanation">
+        <strong>Method Explanation:</strong> Market Basket Analysis (MBA) uses Association Rule Mining (like the Apriori algorithm) to find relationships between items (courses) that are frequently purchased (enrolled) together. Key metrics are **Support** (how often the courses occur together), **Confidence** (likelihood of taking Course B given Course A), and **Lift** (how much better the prediction is than chance).
+    </p>
+
+    <label for="total_students">1. Total Number of Students (Baskets):</label>
+    <input type="number" id="total_students" value="1000" min="100" step="100">
+    
+    <label for="enroll_A">2. Students Enrolled in Course A (Data Science):</label>
+    <input type="number" id="enroll_A" value="200" min="10" step="10">
+
+    <label for="enroll_AB">3. Students Enrolled in BOTH Course A and Course B (Advanced Statistics):</label>
+    <input type="number" id="enroll_AB" value="150" min="10" step="10">
+
+    <label for="enroll_B">4. Students Enrolled in Course B (Advanced Statistics):</label>
+    <input type="number" id="enroll_B" value="300" min="10" step="10">
+
+    <button onclick="runMBA()">Run Course Grouping Analysis</button>
+
+    <div id="result_mba">
+        Enter enrollment data for two courses (A and B).
+    </div>
+</div>
+
+<script>
+// --- Market Basket Analysis (Association Rules) in JavaScript ---
+
+function runMBA() {
+    // 1. Collect Data
+    const total = parseInt(document.getElementById('total_students').value);
+    const countA = parseInt(document.getElementById('enroll_A').value);
+    const countAB = parseInt(document.getElementById('enroll_AB').value);
+    const countB = parseInt(document.getElementById('enroll_B').value);
+
+    // 2. Calculate Association Metrics
+    
+    // Support(A) = P(A)
+    const supportA = countA / total;
+    // Support(B) = P(B)
+    const supportB = countB / total;
+    // Support(A -> B) = P(A & B)
+    const supportAB = countAB / total;
+    
+    // Confidence(A -> B) = P(B | A) = P(A & B) / P(A)
+    const confidence = (countA === 0) ? 0 : countAB / countA;
+
+    // Lift(A -> B) = Confidence(A -> B) / P(B)
+    const lift = (supportB === 0) ? 0 : confidence / supportB;
+
+    // 3. Output and Detailed Interpretation
+    const resultDiv = document.getElementById('result_mba');
+
+    let message = `<h2>MARKET BASKET ANALYSIS (MBA) REPORT</h2>`;
+    message += `<p><strong>Rule: IF Student Takes Course A (Data Science), THEN Student Takes Course B (Advanced Statistics)</strong></p>`;
+    
+    message += `<h3>ASSOCIATION METRICS:</h3>`;
+    message += `<ul>
+        <li><strong>Support (A & B):</strong> ${(supportAB * 100).toFixed(1)}% (Percentage of all students who took both)</li>
+        <li><strong>Confidence (A -> B):</strong> ${(confidence * 100).toFixed(1)}% (Likelihood of B given A)</li>
+        <li><strong>Lift (A -> B):</strong> ${lift.toFixed(2)}</li>
+    </ul>`;
+
+    message += `<h3>ACADEMIC STRATEGY CONCLUSION:</h3>`;
+    
+    if (lift > 1.2) {
+        message += `<p><strong>STRONG POSITIVE ASSOCIATION:</strong> The Lift score (${lift.toFixed(2)}) is significantly above 1.0, meaning the link between Course A and Course B is much stronger than chance. **Action:** Officially bundle these courses, recommend A as a prerequisite for B, or market them together to new students.</p>`;
+    } else if (lift > 0.9 && lift <= 1.2) {
+        message += `<p><strong>WEAK/MODERATE ASSOCIATION:</strong> The courses are taken together about as often as expected by chance. **Action:** Investigate qualitative feedback to see *why* students link them. Promote the link more actively to see if Lift can be increased above 1.2.</p>`;
+    } else {
+        message += `<p><strong>NEGATIVE OR NO ASSOCIATION:</strong> The Lift is close to or below 1.0. **Action:** Do not market or bundle these courses together. They do not naturally align in the student's curriculum path. Focus on finding a stronger complementary course for Course A.</p>`;
+    }
+    
+    resultDiv.innerHTML = message;
+}
+</script>
+
+</body>
+</html>
